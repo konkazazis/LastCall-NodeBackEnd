@@ -13,7 +13,7 @@ const bodyParser = require("body-parser");
 const helmet = require("helmet");
 const fs = require("fs");
 const app = express();
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 8000;
 const HOST = process.env.HOST || "localhost";
 const cors = require("cors");
 const jwt = require("jsonwebtoken");
@@ -37,7 +37,7 @@ const corsOptions = {
     // Allow requests from localhost and the online frontend
     const allowedOrigins = [
       "http://localhost:3000",
-      "https://jobready-frontend-a5f107d0de7b.herokuapp.com",
+      "https://lc-frontend-d59c14215cd2.herokuapp.com",
     ];
     if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
@@ -132,148 +132,6 @@ app.post("/login", async (req, res) => {
   }
 });
 
-app.post("/create-resume", authenticateToken, async (req, res) => {
-  try {
-    console.log("req.body:", req.body);
-    const {
-      userId,
-      fullname,
-      title,
-      email,
-      phone,
-      repos,
-      porfolio,
-      country,
-      linkedin,
-      workExperiences,
-      projects,
-      education,
-      languages,
-      skills,
-    } = req.body;
-
-    // Add any validation checks for the data here if needed
-
-    const createResumeQuery = `
-      INSERT INTO resumes (userId, fullname, title, email, phone, repos, portfolio, country, linkedin, workExperiences, projects, education, languages, skills, last_change)
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, NOW())
-      RETURNING *;`;
-
-    const result = await pool.query(createResumeQuery, [
-      userId,
-      fullname,
-      title,
-      email,
-      phone,
-      repos,
-      porfolio,
-      country,
-      linkedin,
-      workExperiences,
-      projects,
-      education,
-      languages,
-      skills,
-    ]);
-
-    res
-      .status(201)
-      .json({ resume: result.rows[0], message: "Resume created successfully" });
-  } catch (error) {
-    console.error("Error creating resume:", error);
-    res.status(500).json({ error: error.message });
-  }
-});
-
-app.get("/get-resume/:userId", async (req, res) => {
-  try {
-    const userId = req.params.userId;
-
-    const getResumeQuery = `
-      SELECT * FROM resumes
-      WHERE userid = $1;`;
-
-    const result = await pool.query(getResumeQuery, [userId]);
-
-    if (result.rows.length === 0) {
-      return res.status(404).json({ message: "Resume not found" });
-    }
-
-    res.status(200).json({ resume: result.rows });
-  } catch (error) {
-    console.error("Error fetching resume:", error);
-    res.status(500).json({ error: error.message });
-  }
-});
-
-app.put("/update-resume/:resumeId", authenticateToken, async (req, res) => {
-  try {
-    const resumeId = req.params.resumeId;
-    console.log("req.body:", req.body);
-    const {
-      fullname,
-      title,
-      email,
-      phone,
-      repos,
-      portfolio,
-      country,
-      linkedin,
-      workExperiences,
-      projects,
-      education,
-      languages,
-      skills,
-    } = req.body;
-
-    const updateResumeQuery = `
-      UPDATE resumes 
-      SET fullname = COALESCE($1, fullname),
-          title = COALESCE($2, title), 
-          email = COALESCE($3, email),
-          phone = COALESCE($4, phone),
-          repos = COALESCE($5, repos),
-          portfolio = COALESCE($6, portfolio),
-          country = COALESCE($7, country),
-          linkedin = COALESCE($8, linkedin),
-          workExperiences = COALESCE($9, workExperiences), 
-          projects = COALESCE($10, projects), 
-          education = COALESCE($11, education), 
-          languages = COALESCE($12, languages), 
-          skills = COALESCE($13, skills)
-      WHERE id = $14
-      RETURNING *;`;
-
-    const result = await pool.query(updateResumeQuery, [
-      fullname,
-      title,
-      email,
-      phone,
-      repos,
-      portfolio,
-      country,
-      linkedin,
-      workExperiences,
-      projects,
-      education,
-      languages,
-      skills,
-      resumeId,
-    ]);
-
-    if (result.rowCount === 0) {
-      return res.status(404).json({ message: "Resume not found" });
-    }
-
-    res
-      .status(200)
-      .json({ resume: result.rows[0], message: "Resume updated successfully" });
-  } catch (error) {
-    console.error("Error updating resume:", error);
-    res.status(500).json({ error: error.message });
-  }
-});
-
 const startServer = async () => {
   try {
     await pool.connect();
@@ -288,7 +146,6 @@ const startServer = async () => {
 
 pool
   .query(createUserTable)
-  .then(() => pool.query(createResumeTable))
   .then(() => console.log("Tables created successfully"))
   .catch((err) => console.error("Error creating tables:", err));
 //.finally(() => pool.end());
