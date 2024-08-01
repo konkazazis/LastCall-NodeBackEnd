@@ -54,11 +54,11 @@ const { Pool } = require("pg");
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
 
-  // Comment for local development
-  // ssl: {
-  //   require: false,
-  //   rejectUnauthorized: false
-  // }
+  //Comment for local development
+  ssl: {
+    require: false,
+    rejectUnauthorized: false,
+  },
 });
 
 app.use(express.static(path.join(__dirname, "public")));
