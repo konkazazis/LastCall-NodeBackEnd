@@ -55,10 +55,10 @@ const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
 
   //Comment for local development
-  ssl: {
-    require: false,
-    rejectUnauthorized: false,
-  },
+  // ssl: {
+  //   require: false,
+  //   rejectUnauthorized: false,
+  // },
 });
 
 app.use(express.static(path.join(__dirname, "public")));
@@ -121,8 +121,10 @@ app.post("/login", async (req, res) => {
 
     if (result.rows.length > 0) {
       //const token = generateToken(user);
-      const token = jwt.sign({ id: user.id }, SECRET_KEY, { expiresIn: "1h" });
-      res.json({ token, Id: user.id });
+      const token = jwt.sign({ user_id: user.id }, SECRET_KEY, {
+        expiresIn: "1h",
+      });
+      res.json({ token, user_id: user.id, fullname: user.fullname });
     } else {
       res.status(401).json({ message: "Invalid credentials" });
     }
