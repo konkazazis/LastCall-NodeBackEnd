@@ -1,5 +1,5 @@
 //import models
-const { createUserTable, createResumeTable } = require("./modules/models");
+const { createUserTable, createExpensesTable } = require("./modules/models");
 
 const path = require("path");
 require("dotenv").config({
@@ -134,6 +134,34 @@ app.post("/login", async (req, res) => {
   }
 });
 
+app.get("/expenses", authenticateToken, async (req, res) => {
+  try {
+    const { user_id } = req.body;
+    const result = await pool.query(
+      "SELECT * FROM expenses WHERE user_id = $1",
+      [user_id]
+    );
+    res.json(result.rows);
+  } catch (error) {
+    console.error("Error fetching expenses:", error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.post("/expenses", authenticateToken, async (req, res) => {
+  try {
+    const { amount, description, date } = req.body;
+    const result = await pool.query(
+      "INSERT INTO expenses (amount, description, date, user_id) VALUES ($1, $2, $3, $4) RETURNING *",
+      [amount, description, date, req.user.user_id]
+    );
+    res.json(result.rows[0]);
+  } catch (error) {
+    console.error("Error adding expense:", error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
 const startServer = async () => {
   try {
     await pool.connect();
@@ -146,10 +174,18 @@ const startServer = async () => {
   }
 };
 
-pool
-  .query(createUserTable)
-  .then(() => console.log("Tables created successfully"))
-  .catch((err) => console.error("Error creating tables:", err));
+async function createTables() {
+  try {
+    await pool.query(createUserTable);
+    await pool.query(createExpensesTable);
+    console.log("Tables created successfully");
+  } catch (err) {
+    console.error("Error creating tables:", err);
+  }
+}
+
+createTables();
+
 //.finally(() => pool.end());
 
 startServer();

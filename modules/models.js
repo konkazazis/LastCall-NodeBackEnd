@@ -7,6 +7,18 @@ const createUserTable = `
   );
 `;
 
+const createExpensesTable = `
+  CREATE TABLE IF NOT EXISTS expenses (
+    id SERIAL PRIMARY KEY,
+    amount FLOAT,
+    description TEXT,
+    date DATE,
+    user_id INT,
+    FOREIGN KEY (user_id) REFERENCES users(id)
+  );
+`;
+
 module.exports = {
   createUserTable,
+  createExpensesTable,
 };
