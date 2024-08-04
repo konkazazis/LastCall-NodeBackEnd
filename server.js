@@ -136,7 +136,8 @@ app.post("/login", async (req, res) => {
 
 app.get("/expenses", authenticateToken, async (req, res) => {
   try {
-    const { user_id } = req.body;
+    const { user_id } = req.query; // Extract user_id from the query parameters
+    console.log(req.query);
     const result = await pool.query(
       "SELECT * FROM expenses WHERE user_id = $1",
       [user_id]
