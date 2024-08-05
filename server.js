@@ -137,7 +137,6 @@ app.post("/login", async (req, res) => {
 app.get("/expenses", authenticateToken, async (req, res) => {
   try {
     const { user_id } = req.query; // Extract user_id from the query parameters
-    console.log(req.query);
     const result = await pool.query(
       "SELECT * FROM expenses WHERE user_id = $1",
       [user_id]
@@ -159,6 +158,23 @@ app.post("/expenses", authenticateToken, async (req, res) => {
     res.json(result.rows[0]);
   } catch (error) {
     console.error("Error adding expense:", error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.delete("/expenses/:id", authenticateToken, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const result = await pool.query(
+      "DELETE FROM expenses WHERE id = $1 RETURNING *",
+      [id]
+    );
+    if (result.rows.length === 0) {
+      return res.status(404).json({ message: "Expense not found" });
+    }
+    res.json(result.rows[0]);
+  } catch (error) {
+    console.error("Error deleting expense:", error);
     res.status(500).json({ error: error.message });
   }
 });
