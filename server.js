@@ -2,7 +2,10 @@
 const { createUserTable, createExpensesTable } = require("./modules/models");
 
 const path = require("path");
-require("dotenv").config();
+require("dotenv").config({
+  override: true,
+  path: path.resolve(__dirname, ".env"),
+});
 
 // Path: server.js
 const express = require("express");
@@ -10,8 +13,8 @@ const bodyParser = require("body-parser");
 const helmet = require("helmet");
 const fs = require("fs");
 const app = express();
-//const PORT = process.env.PORT || 8000;
-//const HOST = process.env.HOST || "localhost";
+const PORT = process.env.PORT || 8000;
+const HOST = process.env.HOST || "localhost";
 const cors = require("cors");
 const jwt = require("jsonwebtoken");
 // Secret key used to sign the JWT token (keep it secret and don't hardcode it)
