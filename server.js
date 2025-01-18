@@ -2,10 +2,7 @@
 const { createUserTable, createExpensesTable } = require("./modules/models");
 
 const path = require("path");
-require("dotenv").config({
-  override: true,
-  path: path.resolve(__dirname, ".env"),
-});
+require("dotenv").config();
 
 // Path: server.js
 const express = require("express");
