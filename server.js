@@ -13,8 +13,8 @@ const bodyParser = require("body-parser");
 const helmet = require("helmet");
 const fs = require("fs");
 const app = express();
-const PORT = process.env.PORT || 8000;
-const HOST = process.env.HOST || "localhost";
+//const PORT = process.env.PORT || 8000;
+//const HOST = process.env.HOST || "localhost";
 const cors = require("cors");
 const jwt = require("jsonwebtoken");
 // Secret key used to sign the JWT token (keep it secret and don't hardcode it)
@@ -37,7 +37,7 @@ const corsOptions = {
     // Allow requests from localhost and the online frontend
     const allowedOrigins = [
       "http://localhost:3000",
-      "https://lc-frontend-d59c14215cd2.herokuapp.com",
+      "https://lastcall-reactfrontend.fly.dev/",
     ];
     if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
@@ -184,7 +184,7 @@ const startServer = async () => {
     await pool.connect();
     console.log("Connected to PostgreSQL database");
     app.listen(PORT, function () {
-      console.log(`Server is running on http://${HOST}:${PORT}`);
+      console.log(`Server is running...`);
     });
   } catch (err) {
     console.error("Error connecting to PostgreSQL database", err);
